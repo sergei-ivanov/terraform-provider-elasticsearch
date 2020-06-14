@@ -2,6 +2,7 @@ package es
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -92,17 +93,26 @@ func resourceElasticsearchWatchRead(d *schema.ResourceData, m interface{}) error
 		return err
 	}
 
-	ds := &resourceDataSetter{d: d}
-
+	var watch []byte
 	switch m.(type) {
 	case *elastic7.Client:
 		watchResponse := res.(*elastic7.XPackWatcherGetWatchResponse)
-		d.Set("body", watchResponse.Watch)
+		// d.Set("body", watchResponse.Watch)
+		watch, err = json.Marshal(watchResponse.Watch)
+		// ds.set("body", watchResponse.Watch)
 	case *elastic6.Client:
 		watchResponse := res.(*elastic6.XPackWatcherGetWatchResponse)
-		d.Set("body", watchResponse.Watch)
+		// d.Set("body", watchResponse.Watch)
+		// ds.set("body", watchResponse.Watch)
+		watch, err = json.Marshal(watchResponse.Watch)
 	}
 
+	if err != nil {
+		return err
+	}
+
+	ds := &resourceDataSetter{d: d}
+	ds.set("body", string(watch))
 	ds.set("watch_id", d.Id())
 
 	return ds.err

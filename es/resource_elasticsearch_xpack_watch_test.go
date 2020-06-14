@@ -128,12 +128,9 @@ resource "elasticsearch_xpack_watch" "test_watch" {
     }
   },
   "actions": {
-    "test_index": {
-      "index": {
-        "index": "test",
-        "doc_type": "test2"
-      }
-    }
+    "null_ack": {
+	    "ack": null
+	  }
   }
 }
 EOF
