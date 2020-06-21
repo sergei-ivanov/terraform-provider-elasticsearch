@@ -79,13 +79,13 @@ func resourceElasticsearchOpenDistroRolesMappingRead(d *schema.ResourceData, m i
 		return err
 	}
 
-	d.Set("backend_roles", res.BackendRoles)
-	d.Set("hosts", res.Hosts)
-	d.Set("users", res.Users)
-	d.Set("description", res.Description)
-	d.Set("and_backend_roles", res.AndBackendRoles)
-
-	return nil
+	ds := &resourceDataSetter{d: d}
+	ds.set("backend_roles", res.BackendRoles)
+	ds.set("hosts", res.Hosts)
+	ds.set("users", res.Users)
+	ds.set("description", res.Description)
+	ds.set("and_backend_roles", res.AndBackendRoles)
+	return ds.err
 }
 
 func resourceElasticsearchOpenDistroRolesMappingUpdate(d *schema.ResourceData, m interface{}) error {

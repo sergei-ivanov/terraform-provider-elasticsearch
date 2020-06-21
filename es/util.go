@@ -70,6 +70,11 @@ func normalizeDestination(tpl map[string]interface{}) {
 	delete(tpl, "last_update_time")
 }
 
+func normalizeMonitor(tpl map[string]interface{}) {
+	delete(tpl, "last_update_time")
+	delete(tpl, "enabled_time")
+}
+
 func normalizePolicy(tpl map[string]interface{}) {
 	delete(tpl, "last_updated_time")
 	delete(tpl, "error_notification")
@@ -287,6 +292,25 @@ func (ds *resourceDataSetter) set(key string, value interface{}) {
 		return
 	}
 	ds.err = ds.d.Set(key, value)
+}
+
+func (ds *resourceDataSetter) marshalAndSet(key string, value interface{}) {
+	if ds.err != nil {
+		return
+	}
+	// dumb conversion to map[string]interface
+	s, err := json.Marshal(value)
+	if err != nil {
+		ds.err = err
+		return
+	}
+	var flattened interface{}
+	if err := json.Unmarshal(s, &flattened); err != nil {
+		ds.err = err
+		return
+	}
+
+	ds.err = ds.d.Set(key, flattened)
 }
 
 func expandIndexPermissionsSet(resourcesArray []interface{}) ([]IndexPermissions, error) {

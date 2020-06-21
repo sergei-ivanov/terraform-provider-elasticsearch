@@ -82,11 +82,12 @@ func resourceElasticsearchOpenDistroISMPolicyRead(d *schema.ResourceData, m inte
 		return err
 	}
 	d.SetId(policyResponse.PolicyID)
-	d.Set("body", bodyStringNormalized)
-	d.Set("primary_term", policyResponse.PrimaryTerm)
-	d.Set("seq_no", policyResponse.SeqNo)
+	ds := &resourceDataSetter{d: d}
+	ds.set("body", bodyStringNormalized)
+	ds.set("primary_term", policyResponse.PrimaryTerm)
+	ds.set("seq_no", policyResponse.SeqNo)
 
-	return nil
+	return ds.err
 }
 
 func resourceElasticsearchOpenDistroISMPolicyDelete(d *schema.ResourceData, m interface{}) error {

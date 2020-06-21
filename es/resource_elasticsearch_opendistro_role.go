@@ -122,12 +122,12 @@ func resourceElasticsearchOpenDistroRoleRead(d *schema.ResourceData, m interface
 		return err
 	}
 
-	d.Set("tenant_permissions", res.TenantPermissions)
-	d.Set("cluster_permissions", res.ClusterPermissions)
-	d.Set("index_permissions", res.IndexPermissions)
-	d.Set("description", res.Description)
-
-	return nil
+	ds := &resourceDataSetter{d: d}
+	ds.marshalAndSet("tenant_permissions", res.TenantPermissions)
+	ds.marshalAndSet("cluster_permissions", res.ClusterPermissions)
+	ds.marshalAndSet("index_permissions", res.IndexPermissions)
+	ds.set("description", res.Description)
+	return ds.err
 }
 
 func resourceElasticsearchOpenDistroRoleUpdate(d *schema.ResourceData, m interface{}) error {
