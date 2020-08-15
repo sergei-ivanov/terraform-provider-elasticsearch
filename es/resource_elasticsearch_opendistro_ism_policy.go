@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/structure"
 	"github.com/olivere/elastic/uritemplates"
 
 	elastic7 "github.com/olivere/elastic/v7"

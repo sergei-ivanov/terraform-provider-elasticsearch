@@ -3,7 +3,7 @@ package es
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	elastic7 "github.com/olivere/elastic/v7"
 	elastic5 "gopkg.in/olivere/elastic.v5"
 	elastic6 "gopkg.in/olivere/elastic.v6"

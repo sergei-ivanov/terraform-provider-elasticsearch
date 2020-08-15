@@ -5,11 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
+	"github.com/mitchellh/go-homedir"
+	"hash/crc32"
+	"io/ioutil"
+	"os"
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	elastic7 "github.com/olivere/elastic/v7"
 	elastic5 "gopkg.in/olivere/elastic.v5"
 	elastic6 "gopkg.in/olivere/elastic.v6"
@@ -435,7 +438,7 @@ func indexPermissionsHash(v interface{}) int {
 		}
 	}
 
-	return hashcode.String(buf.String())
+	return hashcode(buf.String())
 }
 
 func tenantPermissionsHash(v interface{}) int {
@@ -469,5 +472,53 @@ func tenantPermissionsHash(v interface{}) int {
 		}
 	}
 
-	return hashcode.String(buf.String())
+	return hashcode(buf.String())
+}
+
+// hashcode hashes a string to a unique hash code.
+//
+// crc32 returns a uint32, but for our use we need
+// and non negative integer. Here we cast to an integer
+// and invert it if the result is negative.
+func hashcode(s string) int {
+	v := int(crc32.ChecksumIEEE([]byte(s)))
+	if v >= 0 {
+		return v
+	}
+	if -v >= 0 {
+		return -v
+	}
+	// v == MinInt
+	return 0
+}
+
+// If the argument is a path, readPathOrContent loads it and returns the contents,
+// otherwise the argument is assumed to be the desired contents and is simply
+// returned.
+//
+// The boolean second return value can be called `wasPath` - it indicates if a
+// path was detected and a file loaded.
+func readPathOrContent(poc string) (string, bool, error) {
+	if len(poc) == 0 {
+		return poc, false, nil
+	}
+
+	path := poc
+	if path[0] == '~' {
+		var err error
+		path, err = homedir.Expand(path)
+		if err != nil {
+			return path, true, err
+		}
+	}
+
+	if _, err := os.Stat(path); err == nil {
+		contents, err := ioutil.ReadFile(path)
+		if err != nil {
+			return string(contents), true, err
+		}
+		return string(contents), true, nil
+	}
+
+	return poc, false, nil
 }

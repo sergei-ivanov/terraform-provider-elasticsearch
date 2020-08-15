@@ -5,27 +5,26 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-var testAccProviders map[string]terraform.ResourceProvider
+var testAccProviders map[string]*schema.Provider
 var testAccProvider *schema.Provider
 
-var testAccXPackProviders map[string]terraform.ResourceProvider
+var testAccXPackProviders map[string]*schema.Provider
 var testAccXPackProvider *schema.Provider
 
-var testAccOpendistroProviders map[string]terraform.ResourceProvider
+var testAccOpendistroProviders map[string]*schema.Provider
 var testAccOpendistroProvider *schema.Provider
 
 func init() {
-	testAccProvider = Provider().(*schema.Provider)
-	testAccProviders = map[string]terraform.ResourceProvider{
+	testAccProvider = Provider()
+	testAccProviders = map[string]*schema.Provider{
 		"elasticsearch": testAccProvider,
 	}
 
-	testAccXPackProvider = Provider().(*schema.Provider)
-	testAccXPackProviders = map[string]terraform.ResourceProvider{
+	testAccXPackProvider = Provider()
+	testAccXPackProviders = map[string]*schema.Provider{
 		"elasticsearch": testAccXPackProvider,
 	}
 
@@ -38,8 +37,8 @@ func init() {
 		return xPackOriginalConfigureFunc(d)
 	}
 
-	testAccOpendistroProvider = Provider().(*schema.Provider)
-	testAccOpendistroProviders = map[string]terraform.ResourceProvider{
+	testAccOpendistroProvider = Provider()
+	testAccOpendistroProviders = map[string]*schema.Provider{
 		"elasticsearch": testAccOpendistroProvider,
 	}
 
@@ -54,13 +53,13 @@ func init() {
 }
 
 func TestProvider(t *testing.T) {
-	if err := Provider().(*schema.Provider).InternalValidate(); err != nil {
+	if err := Provider().InternalValidate(); err != nil {
 		t.Fatalf("err: %s", err)
 	}
 }
 
 func TestProvider_impl(t *testing.T) {
-	var _ terraform.ResourceProvider = Provider()
+	var _ = Provider()
 }
 
 func testAccPreCheck(t *testing.T) {
@@ -177,7 +176,7 @@ func TestAWSCredsEnvNamedProfile(t *testing.T) {
 }
 
 func getCreds(t *testing.T, region string, config map[string]interface{}) credentials.Value {
-	testConfigData := schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, config)
+	testConfigData := schema.TestResourceDataRaw(t, Provider().Schema, config)
 	s := awsSession(region, testConfigData)
 	if s == nil {
 		t.Fatalf("awsSession returned nil")
