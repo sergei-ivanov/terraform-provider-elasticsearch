@@ -9,6 +9,7 @@ import (
 )
 
 var testAccProviders map[string]*schema.Provider
+var testAccProviderFactories func(providers *[]*schema.Provider) map[string]func() (*schema.Provider, error)
 var testAccProvider *schema.Provider
 
 var testAccXPackProviders map[string]*schema.Provider
@@ -21,6 +22,18 @@ func init() {
 	testAccProvider = Provider()
 	testAccProviders = map[string]*schema.Provider{
 		"elasticsearch": testAccProvider,
+	}
+	testAccProviderFactories = func(providers *[]*schema.Provider) map[string]func() (*schema.Provider, error) {
+		// this is an SDKV2 compatible hack, the "factory" functions are
+		// effectively singletons for the lifecycle of a resource.Test
+		var factories = make(map[string]func() (*schema.Provider, error), len(testAccProviders))
+		for name, p := range testAccProviders {
+			factories[name] = func() (*schema.Provider, error) {
+				return p, nil
+			}
+			*providers = append(*providers, p)
+		}
+		return factories
 	}
 
 	testAccXPackProvider = Provider()
