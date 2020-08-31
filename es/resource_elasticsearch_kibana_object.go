@@ -187,9 +187,10 @@ func resourceElasticsearchKibanaObjectRead(d *schema.ResourceData, meta interfac
 
 		return err
 	}
+	log.Printf("[TRACE] body: %s", string(*result))
 
 	d.Set("index", index)
-	d.Set("body", result)
+	d.Set("body", string(*result))
 
 	return nil
 }

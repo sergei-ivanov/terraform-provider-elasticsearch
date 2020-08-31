@@ -93,7 +93,7 @@ func resourceElasticsearchXpackRoleMappingRead(d *schema.ResourceData, m interfa
 		return err
 	}
 
-	d.Set("name", roleMapping.Name)
+	d.Set("role_mapping_name", roleMapping.Name)
 	d.Set("roles", roleMapping.Roles)
 	d.Set("enabled", roleMapping.Enabled)
 	d.Set("rules", roleMapping.Rules)
